@@ -24,8 +24,11 @@ class S3FileHandler:
 
     def download(self, src_path, tgt_path):
         (bucket, key) = self.parse_url(src_path)
-        self.s3resource.Bucket(bucket).download_file(key, tgt_path)
-        return tgt_path
+        filename = self.get_filename(src_path)
+        tgt_file_path = os.path.join(tgt_path, filename)
+
+        self.s3resource.Bucket(bucket).download_file(key, tgt_file_path)
+        return tgt_file_path
 
     def upload(self, src_path, tgt_path, bucket):
         filename = self.get_filename(src_path)

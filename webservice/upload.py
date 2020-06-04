@@ -1,5 +1,4 @@
 import logging
-import os
 
 from file_handler import FileHandlerFactory, LocalFileHandler
 
@@ -27,6 +26,6 @@ class UploadHelper:
                     params['bucket'] = destination.get('bucket')
 
                 tgt_path = destination['path']
-                log.info("Uploading {} -> {}".format(file, tgt_path))
+                log.info("Uploading {} to {}".format(file, tgt_path))
 
                 handler.upload(src_path=str(file), tgt_path=tgt_path, **params)

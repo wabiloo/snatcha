@@ -31,7 +31,7 @@ class LocalFileHandler:
         return shutil.copy2(src_path, tgt_path)
 
     def upload(self, src_path, tgt_path):
-        log.debug("Uploading {} to {}".format(src_path, tgt_path))
+        log.debug("Copying {} to {}".format(src_path, tgt_path))
         return self.copy(src_path, tgt_path)
 
 class LocalFileHandlerBuilder:

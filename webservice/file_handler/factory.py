@@ -14,7 +14,7 @@ class FileHandlerFactory(object):
         key = None
         if url.startswith("s3://"):
             key = 's3'
-        if url.startswith("http://") or url.startswith("https://"):
+        elif url.startswith("http://") or url.startswith("https://"):
             key = 'http'
         else:
             key = 'local'
