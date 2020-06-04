@@ -22,6 +22,11 @@ class UploadHelper:
                 if creds:
                     handler.set_credentials(creds)
 
+                params = {}
+                if destination.get('bucket'):
+                    params['bucket'] = destination.get('bucket')
+
                 tgt_path = destination['path']
                 log.info("Uploading {} -> {}".format(file, tgt_path))
-                handler.upload(src_path=file, tgt_path=tgt_path)
+
+                handler.upload(src_path=str(file), tgt_path=tgt_path, **params)
