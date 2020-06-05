@@ -6,13 +6,20 @@ import googleapiclient.discovery
 
 from flask import jsonify
 
+import os
+
+# Get VM ID
+INSTANCE_ID_ = os.environ.get('INSTANCE_ID_')
+PROJECT_NAME_ = os.environ.get('PROJECT_NAME_')
+ZONE_ = os.environ.get('ZONE_')
+
 def main(request):
     print(request.get_json(silent=True))
     # Init gcp client
     manage_instance = manageInstance(
-        project_name="bitmovin-solutions",
-        zone="europe-west1-b",
-        instance_id='8400732780731087393'
+        project_name=PROJECT_NAME_,
+        zone=ZONE_,
+        instance_id=INSTANCE_ID_
     )
     while True:
         # Check instance status every x seconds
@@ -37,27 +44,22 @@ def main(request):
             )
             print('The instance is running. \nStatus: ' + instance_status)
             print(response.text)
-            _to_return = jsonify(response)
             break
         elif instance_status == 'PROVISIONING':
-            # Currenty
             print('The instance is booting up. \nStatus: ' + instance_status)
-            _to_return = instance_status
             continue
         elif instance_status == 'STAGING':
             print('The instance is booting up. \nStatus: ' + instance_status)
-            _to_return = instance_status
             continue
         elif instance_status == 'REPAIRING':
             print('The instance has encounted an issue. \nStatus: ' + instance_status)
-            _to_return = instance_status
             break
         else:
             print('INSTANCE STATUS: ' + instance_status)
             start_instance = manage_instance.start()
             _to_return = start_instance
             continue
-    return _to_return
+    return response.text
 
 
 class manageInstance:
