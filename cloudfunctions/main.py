@@ -37,7 +37,7 @@ def main(request):
             )
             print('The instance is running. \nStatus: ' + instance_status)
             print(response.text)
-            _to_return = response
+            _to_return = jsonify(response)
             break
         elif instance_status == 'PROVISIONING':
             # Currenty
