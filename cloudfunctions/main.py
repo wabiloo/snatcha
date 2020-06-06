@@ -22,6 +22,33 @@ PROJECT_NAME = os.environ.get('GCP_PROJECT')
 db = firestore.Client()
 
 def main(request):
+    print("PATH", request.path)
+    print("QUERY", request.query_string)
+    if request.path.startswith("/transfer"):
+        return do_transfer(request)
+    if request.path.startswith("/status"):
+        return get_status(request)
+
+    else:
+        return "Invalid path"
+
+def get_status(request):
+    print("Handling status request")
+    job_id = request.path.replace("/status/", "")
+    print("JOB ID", job_id  )
+
+    doc_ref = db.collection('snatcha_jobs').document(job_id)
+    doc = doc_ref.get()
+    if doc.exists:
+
+        safe_result = sanitize(doc.to_dict())
+        return jsonify(safe_result)
+    else:
+        return "Invalid job_id {}".format(job_id)
+
+
+def do_transfer(request):
+    print("Handling transfer request")
     payload = request.get_json(silent=True)
     print("PAYLOAD", payload)
 
@@ -39,6 +66,7 @@ def main(request):
         instance_id=INSTANCE_ID
     )
 
+    response_body = dict(job_id=job_id)
     while True:
         # Check instance status every x seconds
         time.sleep(1)
@@ -62,7 +90,7 @@ def main(request):
             )
             print('The instance is running. \nStatus: ' + instance_status)
             print(response.text)
-            return(response.text)
+            response_body = response.json()
             break
         elif instance_status == 'PROVISIONING':
             print('The instance is booting up. \nStatus: ' + instance_status)
@@ -83,7 +111,20 @@ def main(request):
             _to_return = start_instance
             continue
 
-    return job_id
+    return jsonify(response_body)
+
+def sanitize(doc):
+    pld = doc['payload']
+
+    for direction in ['sources', 'targets']:
+        if direction in pld:
+            for part in pld[direction]:
+                if 'credentials' in part:
+                    creds = part['credentials']
+                    for field in ['secret_key', 'password']:
+                        if field in creds:
+                            creds[field] = "***" + creds[field][-4:]
+    return doc
 
 
 class InstanceManager:
