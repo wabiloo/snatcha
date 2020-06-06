@@ -43,6 +43,7 @@ class GcsFileHandler:
             tgt_file_path = os.path.join(tgt_path, filename)
 
             self.gsresource.Bucket(bucket).upload_file(src_path, tgt_file_path)
+            return self._build_url(bucket, tgt_file_path)
         except boto3.exceptions.S3UploadFailedError as e:
             raise RuntimeError(e.args[0])
 
