@@ -1,6 +1,9 @@
+import logging
 import os
 
 from file_handler import FileHandlerFactory
+
+log = logging.getLogger('snatcha.download')
 
 class DownloadHelper:
     def __init__(self, token):
@@ -8,11 +11,23 @@ class DownloadHelper:
         self.tmp_dir = "/tmp/" + token
         os.makedirs(self.tmp_dir, exist_ok=True)
 
-    def download(self, files):
-        for file in files:
-            source_path = file['url']
+    def download(self, sources):
+        for source in sources:
+            for file in source['files']:
+                source_path = None
+                if isinstance(file, dict):
+                    source_path = file['url']
+                if isinstance(file, str):
+                    source_path = file
 
-            handler = FileHandlerFactory().create_for_url(url=source_path)
-            handler.download(src_path=source_path, tgt_path=self.tmp_dir)
+                if source_path:
+                    handler = FileHandlerFactory().create_for_url(url=source_path)
+
+                    creds = source.get('credentials', None)
+                    if creds:
+                        handler.set_credentials(creds)
+
+                    log.info("Downloading {} into {}".format(source_path, self.tmp_dir))
+                    handler.download(src_path=source_path, tgt_path=self.tmp_dir)
 
         return 1
