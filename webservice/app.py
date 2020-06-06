@@ -8,7 +8,10 @@ from process import process_job
 
 from google.cloud import firestore
 
-logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.CRITICAL)
+from logger import SnatchaLogger
+
+logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.CRITICAL)
+log = SnatchaLogger('flask').logger
 
 app = Flask("snatcha")
 app.logger.setLevel(logging.DEBUG)
@@ -24,7 +27,7 @@ def hello():
 @app.route('/transfer-job', methods=['POST'])
 def transfer_job():
     data = request.json
-    logging.debug(json.dumps(data, indent=2))
+    log.debug("REQUEST: " + json.dumps(data, indent=2))
     print("REQUEST", data)
 
     job_id = data['job_id']
@@ -43,10 +46,12 @@ def transfer_job():
 @app.route('/transfer', methods=['POST'])
 def transfer():
     data = request.json
-    logging.debug(json.dumps(data, indent=2))
+    log.debug("REQUEST: " + json.dumps(data, indent=2))
     print("REQUEST", data)
 
     job_id = "direct_" + str(uuid4())
+    log.info("JOB ID: " + job_id)
+
     job = dict(payload=data)
 
     doc_ref = db.collection("snatcha_jobs").document(job_id)

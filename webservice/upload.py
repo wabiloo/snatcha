@@ -2,7 +2,8 @@ import logging
 
 from file_handler import FileHandlerFactory, LocalFileHandler
 
-log = logging.getLogger('snatcha.upload')
+from logger import SnatchaLogger
+log = SnatchaLogger('upload').logger
 
 class UploadHelper:
     def __init__(self, token):

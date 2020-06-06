@@ -8,8 +8,9 @@ from upload import UploadHelper
 
 from google.cloud import firestore
 
-db = firestore.Client()
+from logger import SnatchaLogger
 
+db = firestore.Client()
 
 def process_job(token, job):
     job_spec = job['payload']
@@ -45,7 +46,7 @@ def process_job(token, job):
 
 
 def clean_local_files(token):
-    log = logging.getLogger('snatcha.clean')
+    log = SnatchaLogger('clean').logger
     tmp_dir = "/tmp/" + token
 
     log.debug("Deleting temporary folder {}".format(tmp_dir))
