@@ -1,8 +1,7 @@
 import sys
 sys.path.append("..")
 
-import boto3
-import re
+import boto3, botocore
 import os
 import logging
 
@@ -23,19 +22,29 @@ class S3FileHandler:
         return self.download(src_path, tgt_path)
 
     def download(self, src_path, tgt_path):
-        (bucket, key) = self.parse_url(src_path)
-        filename = self.get_filename(src_path)
-        tgt_file_path = os.path.join(tgt_path, filename)
+        try:
+            (bucket, key) = self.parse_url(src_path)
+            filename = self.get_filename(src_path)
+            tgt_file_path = os.path.join(tgt_path, filename)
 
-        self.s3resource.Bucket(bucket).download_file(key, tgt_file_path)
-        return tgt_file_path
+            self.s3resource.Bucket(bucket).download_file(key, tgt_file_path)
+            return tgt_file_path
+        except botocore.exceptions.ClientError as e:
+            raise RuntimeError(e.args[0])
+
 
     def upload(self, src_path, tgt_path, bucket):
-        filename = self.get_filename(src_path)
-        tgt_file_path = os.path.join(tgt_path, filename)
+        try:
+            filename = self.get_filename(src_path)
+            tgt_file_path = os.path.join(tgt_path, filename)
 
-        self.s3resource.Bucket(bucket).upload_file(src_path, tgt_file_path)
-        return self._build_url(bucket, tgt_file_path)
+            self.s3resource.Bucket(bucket).upload_file(src_path, tgt_file_path)
+            return self._build_url(bucket, tgt_file_path)
+        except botocore.exceptions.ClientError as e:
+            raise RuntimeError(e.args[0])
+        except boto3.exceptions.S3UploadFailedError as e:
+            raise RuntimeError(e.args[0])
+
 
     def parse_url(self, url):
         url = url.replace("s3://","")
