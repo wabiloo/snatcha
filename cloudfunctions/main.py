@@ -1,25 +1,34 @@
+import os
 import requests
-
 import time
+import uuid
 
 import googleapiclient.discovery
+from google.cloud import firestore
 
 from flask import jsonify
 
-import os
-
 # Get VM ID
-INSTANCE_ID_ = os.environ.get('INSTANCE_ID_')
-PROJECT_NAME_ = os.environ.get('PROJECT_NAME_')
-ZONE_ = os.environ.get('ZONE_')
+INSTANCE_ID = os.environ.get('INSTANCE_ID')
+PROJECT_NAME = os.environ.get('GCP_PROJECT')
+ZONE = os.environ.get('FUNCTION_REGION')
+
+db = firestore.Client()
 
 def main(request):
-    print(request.get_json(silent=True))
+    payload = request.get_json(silent=True)
+    print(payload)
+
+    new_id = uuid.uuid4()
+    doc_ref = db.collection('snatcha_jobs').document(new_id)
+    doc_ref.set(dict(payload=payload,
+                     status="PENDING"))
+
     # Init gcp client
-    manage_instance = manageInstance(
-        project_name=PROJECT_NAME_,
-        zone=ZONE_,
-        instance_id=INSTANCE_ID_
+    manage_instance = InstanceManager(
+        project_name=PROJECT_NAME,
+        zone=ZONE,
+        instance_id=INSTANCE_ID
     )
     while True:
         # Check instance status every x seconds
@@ -62,7 +71,7 @@ def main(request):
     return response.text
 
 
-class manageInstance:
+class InstanceManager:
     """
     Management of GCP instances
     """

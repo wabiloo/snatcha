@@ -4,12 +4,14 @@ import logging
 import json
 
 from threading import Thread
-
 from process import process_payload
+
+from google.cloud import firestore
 
 app = Flask("snatcha")
 app.logger.setLevel(logging.DEBUG)
 
+db = firestore.Client()
 
 @app.route('/')
 def hello():
@@ -21,16 +23,20 @@ def transfer():
     data = request.json
     logging.debug(json.dumps(data, indent=2))
 
-    token = str(uuid4())
+    job_id = data['job_id']
 
-    thread = Thread(target=process_payload,
-                    kwargs={
-                        'token': token,
-                        'payload': data
-                    })
+    doc_ref = db.collection("snatcha_jobs").document(job_id)
+    job = doc_ref.get()
+
+    if job.exists():
+        thread = Thread(target=process_payload,
+                        kwargs={
+                            'token': job_id,
+                            'payload': data
+                        })
     thread.start()
 
-    return {'id': token}
+    return dict(id=job_id, status='STARTED')
 
 
 if __name__ == '__main__':
