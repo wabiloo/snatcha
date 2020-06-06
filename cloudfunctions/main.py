@@ -1,13 +1,18 @@
+import datetime
+import json
 import os
 import requests
 import time
 import uuid
+import logging
 
 import googleapiclient.discovery
 from google.cloud import firestore
 from google.cloud import error_reporting
 
 from flask import jsonify
+
+logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.CRITICAL)
 
 # Get VM ID
 INSTANCE_ID = os.environ.get('INSTANCE_ID')
@@ -18,12 +23,14 @@ db = firestore.Client()
 
 def main(request):
     payload = request.get_json(silent=True)
-    print(payload)
+    print("PAYLOAD", payload)
 
     job_id = str(uuid.uuid4())
+    print("JOB ID", job_id)
     doc_ref = db.collection('snatcha_jobs').document(job_id)
     doc_ref.set(dict(payload=payload,
-                     status="PENDING"))
+                     status="PENDING",
+                     created_at=datetime.datetime.now().isoformat()))
 
     # Init gcp client
     instance_manager = InstanceManager(
@@ -45,16 +52,17 @@ def main(request):
             }
             # Pass this endpoints request data to snatcha VM
             # Format request body
-            _data = payload
+            _data = dict(job_id=job_id)
             data = f"""{_data}""".replace('\'', '"')
             # POST to snatcha VM
             response = requests.post(
                 BASE_URL + '/transfer',
                 headers=headers,
-                data=jsonify(job_id=job_id)
+                data=json.dumps(_data)
             )
             print('The instance is running. \nStatus: ' + instance_status)
             print(response.text)
+            return(response.text)
             break
         elif instance_status == 'PROVISIONING':
             print('The instance is booting up. \nStatus: ' + instance_status)
@@ -87,7 +95,7 @@ class InstanceManager:
         self.zone = zone
         self.instance_id = instance_id
         # Init gcp client
-        self.compute = googleapiclient.discovery.build('compute', 'v1')
+        self.compute = googleapiclient.discovery.build('compute', 'v1', cache_discovery=False)
 
     def start(self):
         """

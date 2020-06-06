@@ -28,7 +28,8 @@ class LocalFileHandler:
         return files
 
     def copy(self, src_path, tgt_path):
-        return shutil.copy2(src_path, tgt_path)
+        shutil.copy2(src_path, tgt_path)
+        return tgt_path
 
     def upload(self, src_path, tgt_path):
         log.debug("Copying {} to {}".format(src_path, tgt_path))

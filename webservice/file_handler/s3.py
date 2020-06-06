@@ -35,6 +35,7 @@ class S3FileHandler:
         tgt_file_path = os.path.join(tgt_path, filename)
 
         self.s3resource.Bucket(bucket).upload_file(src_path, tgt_file_path)
+        return self._build_url(bucket, tgt_file_path)
 
     def parse_url(self, url):
         url = url.replace("s3://","")
