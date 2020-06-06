@@ -84,7 +84,7 @@ def do_transfer(request):
             data = f"""{_data}""".replace('\'', '"')
             # POST to snatcha VM
             response = requests.post(
-                BASE_URL + '/transfer',
+                BASE_URL + '/transfer-job',
                 headers=headers,
                 data=json.dumps(_data)
             )
