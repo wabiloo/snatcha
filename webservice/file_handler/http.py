@@ -22,8 +22,12 @@ class HttpFileHandler:
         log.info("Downloading file {} -> {}".format(src_path, tgt_file_path))
 
         with requests.get(src_path, stream=True) as r:
-            with open(tgt_file_path, 'wb') as f:
-                shutil.copyfileobj(r.raw, f)
+            if r.status_code == 200:
+                with open(tgt_file_path, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+            else:
+                raise RuntimeError("Unable to download HTTP {}: {}".format(src_path, r.reason))
+
         return tgt_file_path
 
     def parse_url(self, url):
