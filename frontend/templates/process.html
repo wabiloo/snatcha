@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block head %}
+{{ super() }}
+<meta http-equiv="refresh" content="5">
+{% endblock %}
+{% block content %}
+
+<form id="regForm" method="post" class="shadow">
+  <h2>Snatcha <i class="fa fa-people-carry"></i></h2>
+  <h4 class="text-secondary">Job ID: {{ job_id }}</h4><br>
+  <h4>Status: {{ data["status"] }}</h4>
+
+  {% if data["status"] != "COMPLETE" %}
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div> <br> <br>
+  {% endif %}
+
+  {% if data["status"] == "COMPLETE" %}
+  <a href="/">New Upload</a>
+  {% endif %}
+
+  <p class="text-secondary">
+    Created at: {{ data["created_at"] }} <br>
+    <b>--- Source ---</b> <br>
+    {% for i in data["payload"]["sources"]  %}
+    Access key: {{ i["credentials"]["access_key"] }} <br>
+    Secret key: {{ i["credentials"]["secret_key"] }} <br>
+    Files: {{ i["files"] }} <br> <br>
+    {% endfor %}
+    <b>--- Target ---</b> <br>
+    {% for i in data["payload"]["targets"] %}
+    Bucket: {{ i["bucket"] }} <br>
+    Access key: {{ i["credentials"]["access_key"] }} <br>
+    Secret key: {{ i["credentials"]["secret_key"] }} <br>
+    </p>
+
+{% endfor %}
+
+  </div>
+</form>
+
+{% endblock %}
