@@ -20,7 +20,7 @@ do
   fi
   echo "Idle minutes count = $count"
 
-  if (( count>10 ))
+  if (( count>5 ))
   then
     echo Shutting down
     # wait a little bit more before actually pulling the plug
@@ -29,6 +29,6 @@ do
     sudo poweroff
   fi
 
-  sleep 10
+  sleep 60
 
 done
