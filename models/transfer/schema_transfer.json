@@ -1,0 +1,130 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "Snatcha - Transfer Payload Model",
+    "required": [
+        "sources",
+        "targets"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "sources": {
+            "type": "array",
+            "title": "Sources",
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "required": [
+                            "files"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                            "files": {
+                                "type": "array",
+                                "title": "Simple array",
+                                "additionalItems": true,
+                                "items": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/definitions/url"
+                                        },
+                                        { 
+                                            "type": "object",
+                                            "required": [
+                                                "url"
+                                            ],
+                                            "additionalProperties": true,
+                                            "properties": {
+                                                "url": { "$ref": "#/definitions/url" }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "credentials": { 
+                                "anyOf": [
+                                    { "$ref": "#/definitions/credentials_standard" },
+                                    { "$ref": "#/definitions/credentials_bucket" }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "targets": {
+            "type": "array",
+            "title": "Targets for transfer",
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "type": "object",
+                        "required": [
+                            "provider",
+                            "bucket",
+                            "credentials",
+                            "path"
+                        ],
+                        "additionalProperties": true,
+                        "properties": {
+                            "provider": {
+                                "type": "string",
+                                "enum": ["s3", "gcs"]
+                            },
+                            "bucket": {
+                                "type": "string"
+                            },
+                            "credentials": { "$ref": "#/definitions/credentials_bucket" },
+                            "path": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "credentials_bucket": {
+            "type": "object",
+            "title": "Credentials for buckets",
+            "required": [
+                "access_key",
+                "secret_key"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "access_key": {
+                    "type": "string"
+                },
+                "secret_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "credentials_standard": {
+            "type": "object",
+            "title": "Credentials for users",
+            "required": [
+                "username",
+                "password"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "username": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "url": {
+            "type": "string",
+            "pattern": "^(s3|http|https|gs|ftp):\/\/"
+        }
+    }
+}

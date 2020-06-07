@@ -8,11 +8,12 @@ import logging
 
 import googleapiclient.discovery
 from google.cloud import firestore
-from google.cloud import error_reporting
+
+import fastjsonschema
 
 from flask import jsonify
 
-logging.getLogger('googleapicliet.discovery_cache').setLevel(logging.CRITICAL)
+logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.CRITICAL)
 
 # Get VM ID
 INSTANCE_ID = os.environ.get('INSTANCE_ID')
@@ -58,6 +59,22 @@ def do_transfer(request):
     doc_ref.set(dict(payload=payload,
                      status="PENDING",
                      created_at=datetime.datetime.now().isoformat()))
+
+    # Validate job against schema
+    with open("schema_transfer.json") as schema_file:
+        schema = json.load(schema_file)
+        try:
+            fastjsonschema.validate(schema, payload)
+        except fastjsonschema.exceptions.JsonSchemaException:
+            doc_ref.update(dict(status="INVALID_PAYLOAD",
+                                messages=["Invalid payload submitted"]))
+            return jsonify(dict(job_id=job_id,
+                                status="INVALID_PAYLOAD"))
+        except Exception as e:
+            doc_ref.update(dict(status="ERROR_OTHER",
+                                messages=["Error in validating payload with schema: {}".format(str(e))]))
+            return jsonify(dict(job_id=job_id,
+                                status="ERROR"))
 
     # Init gcp client
     instance_manager = InstanceManager(
