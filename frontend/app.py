@@ -9,6 +9,7 @@ import json
 app = Flask(__name__)
 app.secret_key = str(uuid.uuid4())
 
+# Cloud function trigger
 BASE_URL = "https://europe-west1-bitmovin-solutions.cloudfunctions.net/snatcha-dev-fabre"
 
 @app.route('/', methods=["POST", 'GET'])
@@ -24,6 +25,7 @@ def index():
         output_bucket = request.form['bucket']
         output_path = request.form['bucketpath']
 
+        # Construct payload
         headers = {
             'Content-Type': 'application/json',
         }
@@ -50,12 +52,13 @@ def index():
                     }
                 ]
             }
-        print(data)
+
+        # POST
         response = requests.post(BASE_URL + '/transfer', headers=headers, data=json.dumps(data))
         load_response = json.loads(response.text)
-        job_id = load_response["job_id"]
+        print("CLOUD FUNCTION RESPONSE")
         print(load_response)
-        return redirect('/process/' + job_id)
+        return redirect('/process/' + load_response["job_id"])
     return render_template('index.html')
 
 @app.route('/process/<job_id>', methods=['POST', 'GET'])
