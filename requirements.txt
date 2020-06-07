@@ -1,5 +1,0 @@
-boto3==1.9.31
-botocore==1.13.18
-Flask==1.1.1
-Flask-Compress==1.4.0
-google-cloud-storage==1.28.1

@@ -1,9 +1,9 @@
-import logging
 import os
 
 from file_handler import FileHandlerFactory
 
-log = logging.getLogger('snatcha.download')
+from logger import SnatchaLogger
+log = SnatchaLogger('download').logger
 
 class DownloadHelper:
     def __init__(self, token):

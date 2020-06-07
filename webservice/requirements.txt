@@ -1,0 +1,7 @@
+boto3==1.9.31
+botocore==1.13.18
+Flask==1.1.1
+Flask-Compress==1.4.0
+google-cloud-storage==1.28.1
+google-cloud-error-reporting==0.34.0
+google-cloud-firestore==1.7.0
