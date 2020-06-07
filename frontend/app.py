@@ -65,6 +65,7 @@ def index():
 def process(job_id):
     response = requests.post(BASE_URL + '/status/' + job_id)
     load_response = json.loads(response.text)
+    print(job_id)
     print(load_response)
     return render_template('process.html', job_id=job_id, data=load_response)
 
