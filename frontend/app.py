@@ -22,6 +22,8 @@ def index():
                 source_files.append(request.form[i])
         access_key = request.form['access']
         secret_key = request.form['secret']
+        target_access_key = request.form['targetaccess']
+        target_secret_key = request.form['targetsecret']
         output_bucket = request.form['bucket']
         output_path = request.form['bucketpath']
 
@@ -45,13 +47,16 @@ def index():
                         "provider": "s3",
                         "bucket": output_bucket,
                         "credentials": {
-                            "access_key": "AKIAIU6N2FVXCRB64HDQ",
-                            "secret_key": "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"
+                            "access_key": target_access_key,
+                            "secret_key": target_secret_key
                         },
                         "path": output_path 
                     }
                 ]
             }
+
+        print('PAYLOAD')
+        print(data)
 
         # POST
         response = requests.post(BASE_URL + '/transfer', headers=headers, data=json.dumps(data))

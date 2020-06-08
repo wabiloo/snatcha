@@ -21,6 +21,10 @@
   <a href="/">New Upload</a>
   {% endif %}
 
+  {% if data["status"] == "ERROR_DOWNLOAD" %}
+  <p class="text-secondary">{{ data["errors"] }}</p>
+  {% endif %}
+
   <p class="text-secondary">
     Created at: {{ data["created_at"] }} <br>
     <b>--- Source ---</b> <br>
@@ -34,9 +38,9 @@
     Bucket: {{ i["bucket"] }} <br>
     Access key: {{ i["credentials"]["access_key"] }} <br>
     Secret key: {{ i["credentials"]["secret_key"] }} <br>
-    </p>
+  </p>
 
-{% endfor %}
+  {% endfor %}
 
   </div>
 </form>
