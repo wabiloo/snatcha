@@ -75,4 +75,6 @@ def process(job_id):
     return render_template('process.html', job_id=job_id, data=load_response)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,
+            host="0.0.0.0",
+            port=80)
