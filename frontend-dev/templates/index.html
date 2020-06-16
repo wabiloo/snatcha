@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form id="regForm" method="post" class="shadow">
+  <h2>Snatcha</h2>
+  <p class="text-secondary">Snatcha is a tool that spins up a virtual machine with a fast network connection, downloads the required files and uploads them directly to your target location.</p>
+  <br>
+  <!-- One "tab" for each step in the form: -->
+  <div>
+    <h5 class="font-weight-bold">Configure source files</h5>
+    <button class='btn btn-link add float-right' type="button" style="margin-bottom: 10px;">Add Source</button>
+    <form method="post">
+      <div class="form-group" id="new_chq">
+        <input class='form-control form-control-lg' name="new_0" type="text" placeholder="File URL" required>
+      </div>
+      <input type="hidden" value="0" id="total_chq">
+    <div class="form-group">
+      <input class='form-control form-control-lg' name="access" type="text" placeholder="Access Key - Optional"><br>
+      <input class='form-control form-control-lg' name="secret" type="text" placeholder="secret Key - Optional"> <br>
+    </div>
+  </div>
+  <hr>
+
+  <br><h5 class="font-weight-bold">Output location</h5> <br>
+    <div class="form-group">
+      <div class="form-row">
+        <div class="col">
+          <input class='form-control form-control-lg' name="bucket" type="text" placeholder="Bucket Name" required> <br>
+        </div>
+        <div class="col">
+          <input class='form-control form-control-lg' name="bucketpath" type="text"
+          placeholder="path/to/folder"> <br>        </div>
+      </div>
+
+        <input class='form-control form-control-lg' name="targetaccess" type="text" placeholder="Access Key - Optional"><br>
+      <input class='form-control form-control-lg' name="targetsecret" type="text" placeholder="secret Key - Optional"> <br>
+    </div>
+
+    <button type="submit" style="font-family: 'Roboto', sans-serif;" class="btn btn-lg btn-dark" onclick="submitMessage()">Submit</button>
+
+</form>
+  
+<script>
+
+  // Add new source script
+  $('.add').on('click', add);
+  $('.remove').on('click', remove);
+
+  function add() {
+    var new_chq_no = parseInt($('#total_chq').val()) + 1;
+    var new_input = "<input class='form-control form-control-lg' style='margin-top:20px' placeholder='File URL' type='text' name='new_" + new_chq_no + "'>";
+
+    $('#new_chq').append(new_input);
+
+    $('#total_chq').val(new_chq_no);
+  }
+
+  function remove() {
+    var last_chq_no = $('#total_chq').val();
+
+    if (last_chq_no > 1) {
+      $('#new_' + last_chq_no).remove();
+      $('#total_chq').val(last_chq_no - 1);
+    }
+  }
+
+</script>
+
+{% endblock %}
