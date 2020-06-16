@@ -2,40 +2,69 @@
 
 {% block head %}
 {{ super() }}
-<meta http-equiv="refresh" content="5">
+<!-- <meta http-equiv="refresh" content="5"> -->
 {% endblock %}
 {% block content %}
 
 <form id="regForm" method="post" class="shadow">
   <h2>Snatcha <i class="fa fa-people-carry"></i></h2>
-  <h4 class="text-secondary">Job ID: {{ job_id }}</h4><br>
+  <h4 class="text-secondary">Job ID: {{ job_id }}</h4>
+  <p class="text-secondary">Created at: {{ data["created_at"] }} </p><br>
   <h4>Status: {{ data["status"] }}</h4>
 
-  {% if data["status"] != "COMPLETE" %}
+  {% if data["status"] == "DOWNLOADING" %}
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div> <br> <br>
+  {% endif %}
+
+
+  {% if data["status"] == "UPLOADING" %}
   <div class="spinner-border" role="status">
     <span class="sr-only">Loading...</span>
   </div> <br> <br>
   {% endif %}
 
   {% if data["status"] == "COMPLETE" %}
-  <a href="/">New Upload</a>
-  {% endif %}
+  <a href="/">New Upload</a> <br>
+  <br>
+  <div class="alert alert-success" role="alert">
+    <p class="font-weight-bold">Completed files</p>
+    {% for i in data["results"] %}
+    <p>{{ i }}</p>
+    {% endfor %}
+    {% endif %}
+  </div>
 
   {% if data["status"] == "ERROR_DOWNLOAD" %}
-  <p class="text-secondary">{{ data["errors"] }}</p>
+  <div class="alert alert-danger" role="alert">
+    <p >{{ data["errors"] }}</p>
+  </div>
   {% endif %}
 
-  <p class="text-secondary">
-    Created at: {{ data["created_at"] }} <br>
+  {% if data["status"] == "INVALID_PAYLOAD" %}
+  <div class="alert alert-danger" role="alert">
+    {% for message in data['messages'] %}
+    <p >{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <p class="text-secondary"><br>
     <b>--- Source ---</b> <br>
     {% for i in data["payload"]["sources"]  %}
+    {% if "credentials" in i %}
     Access key: {{ i["credentials"]["access_key"] }} <br>
     Secret key: {{ i["credentials"]["secret_key"] }} <br>
-    Files: {{ i["files"] }} <br> <br>
+    {% endif %}
+    {% for file in i["files"] %}
+    Files: {{ file }} <br> <br>
+    {% endfor %}
     {% endfor %}
     <b>--- Target ---</b> <br>
     {% for i in data["payload"]["targets"] %}
     Bucket: {{ i["bucket"] }} <br>
+    Path: {{ i["path"] }} <br>
     Access key: {{ i["credentials"]["access_key"] }} <br>
     Secret key: {{ i["credentials"]["secret_key"] }} <br>
   </p>
@@ -44,5 +73,15 @@
 
   </div>
 </form>
+
+
+<script>
+
+$(document).ready(function(){
+setInterval(function(){
+    $("#regForm").load(" #regForm > *");
+}, 2000);
+});
+</script>
 
 {% endblock %}
