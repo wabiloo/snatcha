@@ -10,29 +10,18 @@ Snatcha contains 2 components:
 
 ### Virtual Machine
 
-After creating a new virtual machine, run the setup.sh script to configure it and start the service.
+After creating a new virtual machine, run the setup.sh script from the `instance_setup` folder to configure it and start the service.
 
 #### Auto-start
 
-You also need to allow the service to start automatically at startup. The easiest way to do that is to modify the `/etc/rc.local` file
-and add the call to start the flask app into it.
+You also need to allow the service to start automatically at startup. The easiest way to do that is to 
+add custom metadata to the instance.
 
+Create a custom metadata called `startup-script` containing:
 ```
-#!/bin/sh -e
+#! /bin/bash
+/usr/bin/snatcha/instance_setup/auto-off.sh &
 python3 /usr/bin/snatcha/webservice/app.py &
-exit 0
-```
-
-Make your /etc/rc.local executable in case it is not already executable by
-
-```
-sudo chown root /etc/rc.local
-sudo chmod 755 /etc/rc.local
-```
-
-Check everything works fine by executing
-```
-sudo /etc/rc.local start
 ```
 
 ### Cloud Function
