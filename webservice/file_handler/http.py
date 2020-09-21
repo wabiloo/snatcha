@@ -14,7 +14,10 @@ class HttpFileHandler:
         pass
 
     def get_filename(self, path):
-        return os.path.basename(path)
+        flname = os.path.basename(path)
+        flname = flname.split('?', 1)[0]
+        log.info("Filename will be {}".format(flname))
+        return flname
 
     def download(self, src_path, tgt_path):
         tgt_file_path = os.path.join(tgt_path, self.get_filename(src_path))
